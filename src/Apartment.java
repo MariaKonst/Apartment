@@ -1,23 +1,16 @@
-public class Apartment {
-
+public class Apartment implements Comparable<Apartment>{
     private String city;
-    private int numOfRooms;
-    private int areaOfAp;
-    private int price;
-    private String telephone;
-    public Apartment(String city, int numOfRooms, int areaOfAp, int price, String telephone) {
-        city = city;
-        this.numOfRooms = numOfRooms;
-        this.areaOfAp = areaOfAp;
+    private int numberOfRooms;
+    private int area;
+    private int  price;
+    private String telephoneNumber;
+
+    public Apartment(String city, int numberOfRooms, int area, int price, String telephoneNumber) {
+        this.city = city;
+        this.numberOfRooms = numberOfRooms;
+        this.area = area;
         this.price = price;
-        this.telephone = telephone;
-    }
-    public Apartment() {
-       this.city = null;
-        this.numOfRooms = 0;
-        this.areaOfAp = 0;
-        this.price = 0;
-        this.telephone = null;
+        this.telephoneNumber = telephoneNumber;
     }
 
     public String getCity() {
@@ -25,23 +18,23 @@ public class Apartment {
     }
 
     public void setCity(String city) {
-       city = city;
+        this.city = city;
     }
 
-    public int getNumOfRooms() {
-        return numOfRooms;
+    public int getNumberOfRooms() {
+        return numberOfRooms;
     }
 
-    public void setNumOfRooms(int numOfRooms) {
-        this.numOfRooms = numOfRooms;
+    public void setNumberOfRooms(int numberOfRooms) {
+        this.numberOfRooms = numberOfRooms;
     }
 
-    public int getAreaOfAp() {
-        return areaOfAp;
+    public int getArea() {
+        return area;
     }
 
-    public void setAreaOfAp(int areaOfAp) {
-        this.areaOfAp = areaOfAp;
+    public void setArea(int area) {
+        this.area = area;
     }
 
     public int getPrice() {
@@ -52,12 +45,31 @@ public class Apartment {
         this.price = price;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getTelephoneNumber() {
+        return telephoneNumber;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
     }
 
+    @Override
+    public String toString() {
+        return "Apartment{" +
+                "city='" + city + '\'' +
+                ", numberOfRooms=" + numberOfRooms +
+                ", area=" + area +
+                ", price=" + price +
+                ", telephoneNumber='" + telephoneNumber + '\'' +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Apartment o) {
+        if(getPrice()>o.getPrice()){
+            return 1;
+        } else if(getPrice()==o.getPrice()){
+            return 0;
+        }else {return -1;}
+    }
 }

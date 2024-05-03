@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -8,97 +7,84 @@ import java.util.*;
 import java.util.List;
 
 public class Main {
+
+
+
     public static void main(String[] args) {
+        Path resourceDirectory= Paths.get("src");
+        String absolutePath=resourceDirectory.toFile().getAbsolutePath();
+        File f1=new File(absolutePath+ "/resources/testData_Apartments.txt");
+        Scanner sc=null;
+        List<Apartment> ap=new ArrayList<>();
+        Map<String,Integer> numApartments=new HashMap<>();
+        Set<String> brokers=new HashSet<>();
 
 
-        Scanner input = null;
-        List<Apartment> list1 = new ArrayList<>();
-        Map<String, Integer> cityApCounter = new HashMap<>();
-        Set<String> cities = new HashSet<>();
-        cities.add("Sofia"); cities.add("Plovdiv"); cities.add("Varna");
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(cityApCounter.entrySet());
+        try{
+            sc=new Scanner(f1);
+            while(sc.hasNext()){
+                String city=sc.next();
+                int  rooms=sc.nextInt();
+                int area=sc.nextInt();
+                int cost=sc.nextInt();
+                String tel=sc.next();
 
-        list.sort(Map.Entry.comparingByValue());
-        try {
-            Path resource = Paths.get("src", "resources");
-            String absolutepath = resource.toFile().getAbsolutePath();
-            File file = new File(absolutepath + "/testData_Apartments.txt");
-            input = new Scanner(file);
-
-            while (input.hasNext()) {
-                String city = input.next();
-                int numOfRooms = input.nextInt();
-                int areaOfAp = input.nextInt();
-                int price= input.nextInt();
-                String telephone  = input.next();
-                Apartment a =new Apartment(city,numOfRooms,areaOfAp,price,telephone);
-
-                if (areaOfAp >= 100 || numOfRooms==3 || price<=30000 ||  !cities.contains(city)) {
-                    list1.add(a);
-                    continue;
+                Apartment a=new Apartment(city,rooms,area,cost,tel);
+                if(rooms==3 && area>=100 && (city.equals("Бургас") || city.equals("София") || city.equals("Варна"))){
+                    ap.add(a);
+                }
+                if(!numApartments.containsKey(city)){
+                    numApartments.put(city,1);
+                } else{
+                    numApartments.put(city,numApartments.get(city)+1);
                 }
 
-                if(!cityApCounter.containsKey(city)) {
-                    cityApCounter.put(city, 1);
-                } else {
-                    cityApCounter.put(city,cityApCounter.get(city)+1);
-                }
             }
-        } catch (FileNotFoundException e) {
+            if(ap.isEmpty()){
+                throw new UnsuitableApartmentsException();
+            }
+
+
+        }catch(FileNotFoundException e){
             System.out.println(e.getMessage());
-        } finally {
-            assert input != null;
-            input.close();
+        }catch(UnsuitableApartmentsException e){
+            System.out.println("No suitable apartmenhts");
+        }finally{
+
         }
+        Collections.sort(ap);
 
-        cityApCounter = sortByValue(cityApCounter);
+        for(int i=0;i<5;i++) {
+            if (!brokers.contains(ap.get(i).getTelephoneNumber())) {
+                brokers.add(ap.get(i).getTelephoneNumber());
 
-        File file2 = new File("output.txt");
-        if (file2.exists()) {
-            System.out.println("File already exists");
-            System.exit(1);
-        }
-        PrintWriter output = null;
-
-        try {
-            output = new PrintWriter(file2);
-
-            int i = 1;
-            for(String telephone : cityApCounter.keySet()) {
-                if (i == 3) break;
-                i++;
-                output.print(telephone + ": ");
-                for(String el : list.get(telephone)) {
-                    output.print(el + " ");
-                }
-                output.println();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }finally {
-            assert output != null;
+        }
+        PrintWriter output=null;
+        try{
+            Map<String, Integer> cityApCounter = new HashMap<>();
+
+            List<Map.Entry<String, Integer>> list = new ArrayList<>(numApartments.entrySet());
+
+            list.sort(Map.Entry.comparingByValue());
+
+            String city1=list.get(3).getKey();
+            for (Map.Entry<String, Integer> entry : list) {
+                cityApCounter.put(entry.getKey(), entry.getValue());
+            }
+            numApartments=cityApCounter;
+            File file2=new File(absolutePath+ "/resources/output.txt");
+            output=new PrintWriter(file2);
+
+
+            output.println(city1);
+            for(String s:brokers){
+                output.println( s);}
+        } catch (FileNotFoundException o) {
+            o.printStackTrace();
+        }finally{
             output.close();
         }
-    }
 
-    private static HashMap<String, Integer> sortByValue(Map<String, Integer> hm)
-    {
-        List<Map.Entry<String, Integer> > list =
-                new LinkedList<>(hm.entrySet());
-
-        list.sort(new Comparator<Map.Entry<String, Integer>>() {
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        HashMap<String, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> el : list) {
-            temp.put(el.getKey(), el.getValue());
-        }
-        return temp;
     }
 }
-
-
